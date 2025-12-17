@@ -1,0 +1,163 @@
+// ===================== Main.java =====================
+public class Main {
+
+    public static void main(String[] args) {
+
+        Dom dom = new Dom();
+
+        Light l1 = new Light(INHOMELOC.KUCHYNA);
+        Light l2 = new Light(INHOMELOC.OBYVACKA);
+        Light l3 = new Light(INHOMELOC.SPALNA);
+
+        dom.addDevice(l1);
+        dom.addDevice(l2);
+        dom.addDevice(l3);
+
+        Rekuperacia rekuperacia = Rekuperacia.getInstance();
+        dom.addDevice(rekuperacia);
+
+        switchable[] devices = new switchable[dom.getDevices().size()];
+        dom.getDevices().toArray(devices);
+
+        ControlPanel<switchable> panel = new ControlPanel<>(devices);
+
+        panel.switchAll();
+    }
+}
+
+// ===================== INHOMELOC.java =====================
+enum INHOMELOC {
+    PREDSIEN,
+    CHODBA,
+    OBYVACKA,
+    KUCHYNA,
+    WC,
+    KUPELNA,
+    SPALNA,
+    DETSKAIZBA,
+    HOSTOVSKA,
+    TECHNICKA
+}
+
+// ===================== Device.java =====================
+abstract class Device {
+
+    protected boolean on = false;
+    protected INHOMELOC location;
+
+    public void turn_on() {
+        on = true;
+        System.out.println("Zariadenie zapnuté");
+    }
+
+    public void turn_off() {
+        on = false;
+        System.out.println("Zariadenie vypnuté");
+    }
+
+    public boolean isOn() {
+        return on;
+    }
+
+    public void setLocation(INHOMELOC room) {
+        this.location = room;
+    }
+}
+
+// ===================== switchable.java =====================
+interface switchable {
+    void switch_device();
+}
+
+// ===================== shineable.java =====================
+interface shineable {
+    void shine();
+}
+
+// ===================== Light.java =====================
+class Light extends Device implements shineable, switchable {
+
+    public Light(INHOMELOC room) {
+        setLocation(room);
+    }
+
+    @Override
+    public void shine() {
+        turn_on();
+        System.out.println("Svietim v miestnosti " + location);
+    }
+
+    @Override
+    public void switch_device() {
+        if (on) {
+            turn_off();
+        } else {
+            turn_on();
+        }
+    }
+}
+
+// ===================== Rekuperacia.java =====================
+class Rekuperacia extends Device implements switchable {
+
+    private static Rekuperacia instance;
+
+    private Rekuperacia() {
+        setLocation(INHOMELOC.TECHNICKA);
+        System.out.println("Rekuperacia umiestnená v technickej miestnosti");
+    }
+
+    public static Rekuperacia getInstance() {
+        if (instance == null) {
+            instance = new Rekuperacia();
+        }
+        return instance;
+    }
+
+    @Override
+    public void switch_device() {
+        if (on) {
+            turn_off();
+        } else {
+            turn_on();
+        }
+    }
+}
+
+// ===================== Dom.java =====================
+class Dom {
+
+    private java.util.List<Device> devices;
+
+    public Dom() {
+        devices = new java.util.ArrayList<>();
+    }
+
+    public void addDevice(Device d) {
+        devices.add(d);
+    }
+
+    public void removeDevice(Device d) {
+        devices.remove(d);
+    }
+
+    public java.util.List<Device> getDevices() {
+        return devices;
+    }
+}
+
+// ===================== ControlPanel.java =====================
+class ControlPanel<T extends switchable> {
+
+    private T[] devices;
+
+    public ControlPanel(T[] devices) {
+        this.devices = devices;
+    }
+
+    public void switchAll() {
+        for (T d : devices) {
+            d.switch_device();
+        }
+    }
+}
