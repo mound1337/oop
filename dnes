@@ -1,0 +1,163 @@
+// ===================== Main.java =====================
+public class Main {
+
+    public static void main(String[] args) {
+
+        Universe universe = Universe.getInstance();
+
+        Planeta zem = new Planeta("Zem");
+        Planeta mars = new Planeta("Mars");
+        Hviezda slnko = new Hviezda("Slnko");
+
+        universe.addBody(zem);
+        universe.addBody(mars);
+        universe.addBody(slnko);
+
+        slnko.addOrbiting(zem);
+        slnko.addOrbiting(mars);
+
+        for (int i = 0; i < 1000; i++) {
+            universe.addBody(new Kometa("Kometa_" + i));
+            universe.addBody(new Hmlovina("Hmlovina_" + i));
+        }
+
+        Rotocenie<Rotable> rotocenie = new Rotocenie<>(universe.getRotableBodies());
+        rotocenie.rotateVesmir();
+    }
+}
+
+// ===================== Vesmirne_teleso.java =====================
+abstract class Vesmirne_teleso {
+
+    protected String name;
+    protected java.time.LocalDateTime created;
+
+    public Vesmirne_teleso(String name) {
+        this.name = name;
+        this.created = java.time.LocalDateTime.now();
+        System.out.println("Vzniklo teleso: " + name);
+    }
+
+    public void zanik() {
+        System.out.println("Teleso " + name + " explodovalo a zaniklo.");
+    }
+}
+
+// ===================== Universe.java =====================
+class Universe {
+
+    private static Universe instance;
+    private java.util.List<Vesmirne_teleso> bodies;
+
+    private Universe() {
+        bodies = new java.util.ArrayList<>();
+    }
+
+    public static Universe getInstance() {
+        if (instance == null) {
+            instance = new Universe();
+        }
+        return instance;
+    }
+
+    public void addBody(Vesmirne_teleso body) {
+        bodies.add(body);
+    }
+
+    public void removeBody(Vesmirne_teleso body) {
+        bodies.remove(body);
+        body.zanik();
+    }
+
+    public java.util.List<Rotable> getRotableBodies() {
+        java.util.List<Rotable> list = new java.util.ArrayList<>();
+        for (Vesmirne_teleso b : bodies) {
+            if (b instanceof Rotable) {
+                list.add((Rotable) b);
+            }
+        }
+        return list;
+    }
+}
+
+// ===================== Rotable.java =====================
+interface Rotable {
+    void rotate();
+}
+
+// ===================== Planeta.java =====================
+class Planeta extends Vesmirne_teleso {
+
+    public Planeta(String name) {
+        super(name);
+    }
+
+    @Override
+    public void zanik() {
+        System.out.println("Planéta " + name + " nezanikla. (Veď sú tam ľudia, človeče!)");
+    }
+}
+
+// ===================== Hviezda.java =====================
+class Hviezda extends Vesmirne_teleso implements Rotable {
+
+    private java.util.List<Vesmirne_teleso> orbiting;
+
+    public Hviezda(String name) {
+        super(name);
+        orbiting = new java.util.ArrayList<>();
+    }
+
+    public void addOrbiting(Vesmirne_teleso body) {
+        orbiting.add(body);
+    }
+
+    @Override
+    public void rotate() {
+        System.out.println("Hviezda " + name + " sa rotuje.");
+    }
+}
+
+// ===================== Kometa.java =====================
+class Kometa extends Vesmirne_teleso implements Rotable {
+
+    public Kometa(String name) {
+        super(name);
+    }
+
+    @Override
+    public void rotate() {
+        System.out.println("Kométa " + name + " sa rotuje.");
+    }
+}
+
+// ===================== Hmlovina.java =====================
+class Hmlovina implements Rotable {
+
+    private String name;
+
+    public Hmlovina(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void rotate() {
+        System.out.println("Hmlovina " + name + " sa rotuje.");
+    }
+}
+
+// ===================== Rotocenie.java =====================
+class Rotocenie<T extends Rotable> {
+
+    private java.util.List<T> objects;
+
+    public Rotocenie(java.util.List<T> objects) {
+        this.objects = objects;
+    }
+
+    public void rotateVesmir() {
+        for (T obj : objects) {
+            obj.rotate();
+        }
+    }
+}
