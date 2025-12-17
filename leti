@@ -1,0 +1,147 @@
+// ===================== Main.java =====================
+public class Main {
+
+    public static void main(String[] args) {
+
+        World world = new World();
+
+        world.addObject(new Human("Ján", java.time.LocalDate.of(2000, 5, 10)));
+        world.addObject(new Bird("Vrabec"));
+        world.addObject(new Airplane("Boeing"));
+        world.addObject(new Superman("Clark Kent"));
+
+        world.startFlyingAll();
+    }
+}
+
+// ===================== AbstractObject.java =====================
+abstract class AbstractObject {
+
+    protected int x;
+    protected int y;
+    protected int z;
+
+    public AbstractObject(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public void move(int dx, int dy, int dz) {
+        x += dx;
+        y += dy;
+        z += dz;
+    }
+
+    public abstract void move();
+}
+
+// ===================== Flyable.java =====================
+interface Flyable {
+    void fly();
+}
+
+// ===================== Human.java =====================
+class Human extends AbstractObject {
+
+    private String name;
+    private java.time.LocalDate birthDate;
+
+    public Human(String name, java.time.LocalDate birthDate) {
+        super(0, 0, 0);
+        this.name = name;
+        this.birthDate = birthDate;
+    }
+
+    @Override
+    public void move() {
+        move(1, 0, 0);
+        System.out.println("Človek sa pohol po zemi");
+    }
+}
+
+// ===================== Bird.java =====================
+class Bird extends AbstractObject implements Flyable {
+
+    private String type;
+
+    public Bird(String type) {
+        super(0, 0, 10);
+        this.type = type;
+    }
+
+    @Override
+    public void move() {
+        fly();
+    }
+
+    @Override
+    public void fly() {
+        move(0, 0, 5);
+        System.out.println("Vták letí");
+    }
+}
+
+// ===================== Airplane.java =====================
+class Airplane extends AbstractObject implements Flyable {
+
+    private String model;
+
+    public Airplane(String model) {
+        super(0, 0, 100);
+        this.model = model;
+    }
+
+    @Override
+    public void move() {
+        fly();
+    }
+
+    @Override
+    public void fly() {
+        move(10, 0, 20);
+        System.out.println("Lietadlo letí");
+    }
+}
+
+// ===================== Superman.java =====================
+class Superman extends AbstractObject implements Flyable {
+
+    private String realName;
+
+    public Superman(String realName) {
+        super(0, 0, 50);
+        this.realName = realName;
+    }
+
+    @Override
+    public void move() {
+        fly();
+    }
+
+    @Override
+    public void fly() {
+        move(5, 5, 10);
+        System.out.println("Superman letí");
+    }
+}
+
+// ===================== World.java =====================
+class World {
+
+    private java.util.List<AbstractObject> objects = new java.util.ArrayList<>();
+
+    public void addObject(AbstractObject obj) {
+        objects.add(obj);
+    }
+
+    public void startFlyingAll() {
+        for (AbstractObject obj : objects) {
+            if (obj instanceof Flyable) {
+                ((Flyable) obj).fly();
+            } else {
+                obj.move();
+            }
+        }
+    }
+}
