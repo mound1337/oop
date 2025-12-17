@@ -1,0 +1,146 @@
+// ===================== Main.java =====================
+public class Main {
+
+    public static void main(String[] args) {
+
+        Vehicle vehicle = new Vehicle();
+
+        vehicle.addSuciastka(new Engine(VehiclePosition.FRONT_AREA));
+        vehicle.addSuciastka(new Battery(VehiclePosition.REAR_AREA));
+
+        for (int i = 0; i < 4; i++) {
+            vehicle.addSuciastka(new Wheel(VehiclePosition.FRONT_AREA));
+        }
+
+        vehicle.diagnoseAll();
+        vehicle.startAll();
+        vehicle.stopAll();
+    }
+}
+
+// ===================== VehiclePosition.java =====================
+enum VehiclePosition {
+    CABIN,
+    FRONT_AREA,
+    REAR_AREA
+}
+
+// ===================== Suciastka.java =====================
+abstract class Suciastka {
+    protected VehiclePosition position;
+
+    public Suciastka(VehiclePosition position) {
+        this.position = position;
+    }
+
+    public VehiclePosition getPosition() {
+        return position;
+    }
+}
+
+// ===================== Diagnosable.java =====================
+interface Diagnosable {
+    void diagnose();
+}
+
+// ===================== Startable.java =====================
+interface Startable {
+    void start();
+    void stop();
+}
+
+// ===================== Engine.java =====================
+class Engine extends Suciastka implements Diagnosable, Startable {
+
+    public Engine(VehiclePosition position) {
+        super(position);
+    }
+
+    @Override
+    public void diagnose() {
+        System.out.println("Diagnostika motora.");
+    }
+
+    @Override
+    public void start() {
+        System.out.println("Motor nastartovaný.");
+    }
+
+    @Override
+    public void stop() {
+        System.out.println("Motor vypnutý.");
+    }
+}
+
+// ===================== Wheel.java =====================
+class Wheel extends Suciastka implements Diagnosable {
+
+    public Wheel(VehiclePosition position) {
+        super(position);
+    }
+
+    @Override
+    public void diagnose() {
+        System.out.println("Diagnostika kolesa.");
+    }
+}
+
+// ===================== Battery.java =====================
+class Battery extends Suciastka implements Diagnosable, Startable {
+
+    public Battery(VehiclePosition position) {
+        super(position);
+    }
+
+    @Override
+    public void diagnose() {
+        System.out.println("Diagnostika batérie.");
+    }
+
+    @Override
+    public void start() {
+        System.out.println("Batéria zapnutá.");
+    }
+
+    @Override
+    public void stop() {
+        System.out.println("Batéria vypnutá.");
+    }
+}
+
+// ===================== Vehicle.java =====================
+class Vehicle {
+    private java.util.List<Suciastka> suciastky;
+
+    public Vehicle() {
+        suciastky = new java.util.ArrayList<>();
+    }
+
+    public void addSuciastka(Suciastka s) {
+        suciastky.add(s);
+    }
+
+    public void startAll() {
+        for (Suciastka s : suciastky) {
+            if (s instanceof Startable) {
+                ((Startable) s).start();
+            }
+        }
+    }
+
+    public void stopAll() {
+        for (Suciastka s : suciastky) {
+            if (s instanceof Startable) {
+                ((Startable) s).stop();
+            }
+        }
+    }
+
+    public void diagnoseAll() {
+        for (Suciastka s : suciastky) {
+            if (s instanceof Diagnosable) {
+                ((Diagnosable) s).diagnose();
+            }
+        }
+    }
+}
